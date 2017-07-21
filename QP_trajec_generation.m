@@ -3,7 +3,7 @@ c = zeros(4*(order+1)*m);               %coefficients of polynomial functions
 
 %Quadratic cost function (minimum snap) : J = c.' * A * c
 mu_r = 1; mu_psi = 1;                   %constants that makes the integrand nondimensional
-k_r = 2; k_psi = 2; %3  %2
+k_r = 3; k_psi = 2; %3  %2
 
 %Compute the cost function matrix, A
 A = computeA(order, m, mu_r, mu_psi, k_r, k_psi, t);

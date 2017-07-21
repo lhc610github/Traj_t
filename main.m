@@ -4,9 +4,9 @@ lc = lcm.lcm.LCM('udpm://239.255.76.67:7667?ttl=1');
 %pause(2);
 lc.getSingleton();
 aggregator = lcm.lcm.MessageAggregator();
-name_status_topic = 'uav_status_2'
-name_traject_topic = 'uav_traject_2'
-real_expirent_flag = false;%true;
+name_status_topic = 'uav_status_3'
+name_traject_topic = 'uav_traject_3'
+real_expirent_flag = true;
 if(real_expirent_flag)
     lc.subscribe(name_status_topic,aggregator);
     while true
@@ -21,7 +21,7 @@ if(real_expirent_flag)
     [initial_roll,initial_pitch,initial_yaw] = get_euler_from_q(get_uav_status.orientation(1),get_uav_status.orientation(2),get_uav_status.orientation(3),get_uav_status.orientation(4))
     initial_uav_status = [get_uav_status.position(1);
                           get_uav_status.position(2);
-                          get_uav_status.position(3);initial_yaw];  %Todo get the yaw for orientation
+                          get_uav_status.position(3);initial_yaw];  
 
 else
     initial_uav_status = zeros(4,1);
@@ -49,7 +49,7 @@ QP_trajec_generation;
 drawSolution;
 
 msg = uav_traject.uav_traject_t();
-msg.timestamp = get_unix_timestamp(now);
+msg.timestamp = get_unix_timestamp(now)*1000000;
 msg.num_keyframe = temp_m;
 msg.order_p_1 = order+1;
 msg.t = t(2:end);
@@ -61,33 +61,45 @@ for i = 1:temp_m
         msg.traject(i,j,4) = solution((i-1)*(order+1)*4 + 3*(order+1) + j);
     end
 end
+
 if(real_expirent_flag)
 disp start_sending
-if get_uav_status.mode == 3
-   disp('uav has a trajectory,but we will still send a new one for 10 times in a second')
-   for i = 1:10
-            lc.publish('uav_traject_2', msg);
-            pause(0.2)
-   end
-else
-   disp('uav has no trajectory, sending one untill the uav has one traject')
-   aggregator1 = lcm.lcm.MessageAggregator();
-   lc.subscribe(name_status_topic,aggregator1);
-   while get_uav_status.mode ~= 3
-    lc.publish(name_traject_topic, msg);
-    pause(1)
-    while true
-        disp waiting
-        millis_to_wait = 1000;
-        lcm_uav_status = aggregator1.getNextMessage(millis_to_wait);
-        if length(lcm_uav_status) > 0
-         break
-        end
-    end
-    get_uav_status = uav_status.uav_status_t(lcm_uav_status.data);
-   end
+% if get_uav_status.mode == 3
+%    disp('uav has a trajectory,but we will still send a new one for 10 times in a second')
+%    for i = 1:10
+%             lc.publish(name_traject_topic, msg);
+%             pause(0.2)
+%    end
+% else
+%    disp('uav has no trajectory, sending one untill the uav has one traject')
+%    aggregator1 = lcm.lcm.MessageAggregator();
+%    lc.subscribe(name_status_topic,aggregator1);
+%    while get_uav_status.mode ~= 3
+%     lc.publish(name_traject_topic, msg);
+%     pause(1)
+%     while true
+%         disp waiting
+%         millis_to_wait = 1000;
+%         lcm_uav_status = aggregator1.getNextMessage(millis_to_wait);
+%         if length(lcm_uav_status) > 0
+%          break
+%         end
+%     end
+%     get_uav_status = uav_status.uav_status_t(lcm_uav_status.data);
+%    end
+% end
+% 
+% disp send_done
+while 1
+if (get_unix_timestamp(now)*1000000 - msg.timestamp) > (t(end)*1000000 + 1000000)
+    msg.timestamp = get_unix_timestamp(now)*1000000;
 end
-
-disp send_done
+lc.publish(name_traject_topic, msg);
+pause(0.2)
 end
-msg.traject
+%    for i = 1:20
+%              lc.publish(name_traject_topic, msg);
+%              pause(0.2)
+%    end
+end
+%msg.traject

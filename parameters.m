@@ -11,10 +11,10 @@ t_f = 10;                               %final time of the simulation
 
 keyframe_selection_flag = true;         %true : select manually, false : use the given test data
 if(keyframe_selection_flag)
-    m = 9;                              %number of keyframes
+    m = 2;                              %number of keyframes
 end
 
-order = 5;                       %6     %order of polynomial functions %6
+order = 6;                       %6     %order of polynomial functions %6
 
 time_interval_selection_flag = false;    %true : fixed time interval, false : optimal time interval
 if(time_interval_selection_flag)

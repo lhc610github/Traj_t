@@ -17,11 +17,13 @@ if(k_r>=2)
 end
 %jerk
 if(k_r>=3)
-    %all zeros
+    
 end
 %snap
 if(k_r>=4)
-    %all zeros
+    constraintData_r(1,4,3) = 0;            %At starting position
+    constraintData_r(2:m,4,1:2) = eps;      %x,y accelerations
+    constraintData_r(2:m,4,3) = eps;        %z acceleration
 end
 
 %Yaw constraints

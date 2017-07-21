@@ -22,7 +22,7 @@ set( gca, 'XTick', -1:1:1 );
 set( gca, 'XTickLabel', {'','',''} );
 grid on; hold on;
 xlabel('yaw');
-axis([-1 1 -pi/2 pi/2]);
+axis([-1 1 -pi pi]);
 
 %subplot(2,2,[3 4]);             %3-dimensional view
 subplot(2,4,4);             %3-dimensional view
